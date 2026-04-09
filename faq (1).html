@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zoho CRM Help Centre</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --ink: #1A1814;
+    --ink2: #5C5850;
+    --ink3: #9C9890;
+    --accent: #1D5C8A;
+    --accent-light: #E8F1F8;
+    --green: #1A6B45;
+    --green-light: #E6F4EE;
+    --purple: #4A3A8C;
+    --purple-light: #EEEAF8;
+    --border: #E8E4DC;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* NAV */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-logo {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 14px; font-weight: 500;
+  }
+  .nav-badge {
+    font-size: 11px; font-family: 'DM Sans', sans-serif;
+    background: var(--accent-light); color: var(--accent);
+    padding: 3px 8px; border-radius: 20px; font-weight: 500;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent);
+    background: var(--accent-light);
+    padding: 4px 12px; border-radius: 20px; margin-bottom: 1.25rem;
+  }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    max-width: 600px;
+    margin-left: auto; margin-right: auto;
+  }
+  .hero p {
+    font-size: 16px; color: var(--ink2);
+    max-width: 480px; margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+  .search-wrap {
+    max-width: 520px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .search-wrap svg {
+    position: absolute; left: 16px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink3);
+  }
+  #search {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    font-size: 15px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--border);
+    border-radius: 50px;
+    background: var(--bg);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  #search:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(29,92,138,0.1);
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+
+  /* FILTERS */
+  .filters-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 2.5rem;
+  }
+  .filter-label {
+    font-size: 12px; color: var(--ink3);
+    align-self: center; margin-right: 4px;
+    font-weight: 500; letter-spacing: 0.04em;
+  }
+  .chip {
+    padding: 6px 14px;
+    font-size: 12px; font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--border);
+    border-radius: 20px; cursor: pointer;
+    background: var(--surface); color: var(--ink2);
+    transition: all 0.15s; font-weight: 400;
+    user-select: none;
+  }
+  .chip:hover { border-color: var(--ink3); }
+  .chip.active-agent { background: var(--accent-light); color: var(--accent); border-color: var(--accent); font-weight: 500; }
+  .chip.active-lead { background: var(--green-light); color: var(--green); border-color: var(--green); font-weight: 500; }
+  .chip.active-both { background: var(--purple-light); color: var(--purple); border-color: var(--purple); font-weight: 500; }
+  .chip.active-topic { background: var(--ink); color: white; border-color: var(--ink); font-weight: 500; }
+
+  /* SECTION */
+  .section { margin-bottom: 3rem; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1rem;
+  }
+  .section-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; color: var(--ink);
+  }
+  .section-count {
+    font-size: 11px; color: var(--ink3);
+    background: var(--bg); border: 1px solid var(--border);
+    padding: 2px 8px; border-radius: 20px; margin-left: auto;
+  }
+
+  /* FAQ CARD */
+  .faq-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .faq-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .faq-q {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 16px 20px; cursor: pointer;
+  }
+  .role-badge {
+    flex-shrink: 0; margin-top: 1px;
+    font-size: 9px; font-weight: 500; letter-spacing: 0.05em;
+    padding: 3px 7px; border-radius: 4px; text-transform: uppercase;
+  }
+  .badge-agent { background: var(--accent-light); color: var(--accent); }
+  .badge-lead { background: var(--green-light); color: var(--green); }
+  .badge-both { background: var(--purple-light); color: var(--purple); }
+  .faq-photo {
+    width: 36px; height: 36px; border-radius: 8px;
+    object-fit: cover; flex-shrink: 0; border: 1px solid var(--border);
+  }
+  .faq-photo-placeholder {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--bg); border: 1px solid var(--border);
+    flex-shrink: 0; display: flex; align-items: center;
+    justify-content: center; color: var(--ink3); font-size: 14px;
+  }
+  .faq-q-text {
+    flex: 1;
+    font-size: 15px; color: var(--ink); line-height: 1.5;
+  }
+  .faq-chevron {
+    flex-shrink: 0; color: var(--ink3);
+    transition: transform 0.25s; margin-top: 2px;
+  }
+  .faq-chevron.open { transform: rotate(180deg); }
+  .faq-a {
+    display: none;
+    padding: 0 20px 18px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .faq-a.open { display: block; }
+  .faq-a-inner {
+    padding-top: 14px;
+    font-size: 14px; color: var(--ink2); line-height: 1.8;
+  }
+  .faq-a-inner p { margin-bottom: 8px; }
+  .faq-a-inner ul { margin: 8px 0 8px 18px; }
+  .faq-a-inner li { margin-bottom: 6px; }
+  .faq-a-inner code {
+    font-family: monospace; font-size: 12px;
+    background: var(--bg); padding: 1px 5px;
+    border-radius: 4px; color: var(--ink);
+    border: 1px solid var(--border);
+  }
+  .tip {
+    margin-top: 12px; padding: 10px 14px;
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    font-size: 13px; color: var(--accent);
+  }
+  .faq-img-wrap {
+    margin-top: 12px; border-radius: 8px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .faq-img-wrap img {
+    width: 100%; display: block;
+    max-height: 260px; object-fit: cover;
+  }
+
+  /* NO RESULTS */
+  .no-results {
+    text-align: center; padding: 4rem 2rem;
+    color: var(--ink3);
+  }
+  .no-results svg { margin-bottom: 1rem; opacity: 0.4; }
+  .no-results p { font-size: 15px; }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: flex; gap: 1.5rem; flex-wrap: wrap;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .stat { text-align: center; }
+  .stat-num { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--ink); }
+  .stat-label { font-size: 11px; color: var(--ink3); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  /* LEGEND */
+  .legend {
+    display: flex; gap: 1.25rem; flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--ink2); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  footer {
+    text-align: center; padding: 2rem;
+    font-size: 12px; color: var(--ink3);
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    margin-top: 2rem;
+  }
+
+  /* ── LEAD LOOKUP SECTION ── */
+  .lookup-section {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 2.5rem 2rem;
+  }
+  .lookup-inner {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .lookup-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+  .lookup-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, #1D5C8A 0%, #0f3a5c 100%);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .lookup-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; color: var(--ink);
+  }
+  .lookup-header p {
+    font-size: 13px; color: var(--ink3); margin-top: 2px;
+  }
+  .lookup-form {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    align-items: flex-end; margin-bottom: 1.5rem;
+  }
+  .lookup-field {
+    display: flex; flex-direction: column; gap: 6px;
+    flex: 1; min-width: 200px;
+  }
+  .lookup-field label {
+    font-size: 11px; font-weight: 500; color: var(--ink3);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .lookup-input {
+    padding: 11px 14px; font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    background: var(--bg); color: var(--ink); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .lookup-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(29,92,138,0.08);
+  }
+  .lookup-btn {
+    padding: 11px 22px; background: var(--accent);
+    color: white; border: none; border-radius: 10px;
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    font-weight: 500; cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    display: flex; align-items: center; gap: 8px;
+    white-space: nowrap; align-self: flex-end;
+  }
+  .lookup-btn:hover { opacity: 0.88; }
+  .lookup-btn:active { transform: scale(0.98); }
+  .lookup-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .lookup-filter-row {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 1.25rem; flex-wrap: wrap;
+  }
+  .filter-info {
+    font-size: 12px; color: var(--ink3);
+    background: var(--bg); border: 1px solid var(--border);
+    padding: 5px 12px; border-radius: 20px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .filter-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+
+  /* LEAD RESULTS */
+  .lead-results { margin-top: 0.5rem; }
+  .lead-results-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .results-title {
+    font-size: 14px; font-weight: 500; color: var(--ink);
+  }
+  .results-count {
+    font-size: 12px; color: var(--ink3);
+    background: var(--bg); border: 1px solid var(--border);
+    padding: 3px 10px; border-radius: 20px;
+  }
+  .lead-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .lead-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1rem 1.125rem;
+    transition: box-shadow 0.2s, border-color 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .lead-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--accent);
+    border-radius: 3px 0 0 3px;
+  }
+  .lead-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 2px 12px rgba(29,92,138,0.08);
+  }
+  .lead-card-top {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 8px; margin-bottom: 10px;
+  }
+  .lead-name {
+    font-size: 14px; font-weight: 500; color: var(--ink); line-height: 1.4;
+  }
+  .lead-company { font-size: 12px; color: var(--ink3); margin-top: 2px; }
+  .lead-status-pill {
+    flex-shrink: 0; font-size: 10px; font-weight: 500;
+    padding: 3px 9px; border-radius: 20px; text-transform: uppercase;
+    letter-spacing: 0.04em; white-space: nowrap;
+  }
+  .status-new { background: var(--accent-light); color: var(--accent); }
+  .status-connected { background: var(--green-light); color: var(--green); }
+  .status-attempted { background: #FEF3E2; color: #92510A; }
+  .status-other { background: var(--bg); color: var(--ink3); border: 1px solid var(--border); }
+  .lead-meta {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .lead-meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .meta-label { font-size: 10px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.05em; }
+  .meta-value { font-size: 12px; color: var(--ink2); }
+  .meta-value.highlight { color: var(--accent); font-weight: 500; }
+
+  /* LOOKUP STATES */
+  .lookup-loading {
+    text-align: center; padding: 2.5rem;
+    color: var(--ink3); font-size: 14px;
+  }
+  .spinner {
+    width: 28px; height: 28px; border: 2.5px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .lookup-empty {
+    text-align: center; padding: 2.5rem;
+    color: var(--ink3); font-size: 14px;
+  }
+  .lookup-empty svg { opacity: 0.3; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto; }
+  .lookup-error {
+    background: #FEF2F2; border: 1px solid #FECACA;
+    border-radius: 10px; padding: 1rem 1.25rem;
+    color: #991B1B; font-size: 13px; display: flex; gap: 10px; align-items: flex-start;
+  }
+  .lookup-token-wrap {
+    margin-bottom: 1.25rem; padding: 1rem 1.25rem;
+    background: #FEF3E2; border: 1px solid #FDE68A;
+    border-radius: 10px; font-size: 13px; color: #78350F;
+  }
+  .lookup-token-wrap input {
+    margin-top: 8px; width: 100%; padding: 8px 12px;
+    font-size: 13px; font-family: 'DM Sans', sans-serif;
+    border: 1.5px solid #FDE68A; border-radius: 8px;
+    background: white; color: var(--ink); outline: none;
+  }
+  .token-save-btn {
+    margin-top: 8px; padding: 7px 16px; background: #92510A;
+    color: white; border: none; border-radius: 7px; font-size: 12px;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; font-weight: 500;
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 2.5rem 1rem 2rem; }
+    .main { padding: 2rem 1rem; }
+    nav { padding: 0 1rem; }
+    .lookup-section { padding: 2rem 1rem; }
+    .lead-grid { grid-template-columns: 1fr; }
+    .lookup-form { flex-direction: column; }
+    .lookup-btn { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#">
+    <div class="nav-logo">Z</div>
+    CRM Help Centre
+  </a>
+  <span class="nav-badge" id="faq-count-badge">19 articles</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Internal Knowledge Base</div>
+  <h1>How can we help you today?</h1>
+  <p>Quick answers for Sales Agents and Team Leads on using Zoho CRM effectively.</p>
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input id="search" type="text" placeholder="Search questions, keywords…" oninput="filterFAQ()">
+  </div>
+</div>
+
+<!-- ── LEAD LOOKUP SECTION ── -->
+<div class="lookup-section">
+  <div class="lookup-inner">
+
+    <div class="lookup-header">
+      <div class="lookup-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div>
+        <h2>Active Lead Lookup</h2>
+        <p>Enter a Customer ID to view all active leads linked to that account</p>
+      </div>
+    </div>
+
+    <!-- Token setup (only shown if no token saved) -->
+    <div class="lookup-token-wrap" id="token-setup-wrap">
+      <strong>Setup required:</strong> Enter your Zoho CRM OAuth Access Token to enable live lead lookup.
+      <input type="password" id="zoho-token-input" placeholder="Paste your Zoho CRM access_token here…">
+      <button class="token-save-btn" onclick="saveToken()">Save Token</button>
+      <div style="margin-top:6px;font-size:11px;opacity:0.7">Token is stored in your browser only. Get it from: Zoho API Console → OAuth → Access Token.</div>
+    </div>
+
+    <div class="lookup-form">
+      <div class="lookup-field">
+        <label>Customer ID</label>
+        <input class="lookup-input" id="customer-id-input" type="text" placeholder="e.g. 738291004" maxlength="40"
+          onkeydown="if(event.key==='Enter')lookupLeads()">
+      </div>
+      <button class="lookup-btn" id="lookup-btn" onclick="lookupLeads()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Search Leads
+      </button>
+    </div>
+
+    <div class="lookup-filter-row">
+      <div class="filter-info">
+        <div class="filter-dot"></div>
+        Active leads only (Expired = false)
+      </div>
+      <div class="filter-info">
+        <div class="filter-dot" style="background:var(--accent)"></div>
+        Created: 15 Oct 2025 → Today
+      </div>
+    </div>
+
+    <div id="lead-results-wrap"></div>
+
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="stats-bar" id="stats-bar"></div>
+
+  <div class="filters-row">
+    <span class="filter-label">Role</span>
+    <div class="chip active-agent" id="chip-agent" onclick="toggleRole('agent',this)">Sales Agent</div>
+    <div class="chip active-lead" id="chip-lead" onclick="toggleRole('lead',this)">Team Lead</div>
+    <div class="chip active-both" id="chip-both" onclick="toggleRole('both',this)">Both</div>
+    <span class="filter-label" style="margin-left:12px">Topic</span>
+    <div class="chip active-topic" id="chip-all" data-topic="all" onclick="setTopic('all',this)">All</div>
+    <div class="chip" id="chip-leads" data-topic="leads" onclick="setTopic('leads',this)">Leads & Contacts</div>
+    <div class="chip" id="chip-users" data-topic="users" onclick="setTopic('users',this)">User & Roles</div>
+    <div class="chip" id="chip-data" data-topic="data" onclick="setTopic('data',this)">Data & Fields</div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>Sales Agent</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>Team Lead</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Both</div>
+  </div>
+
+  <div id="faq-list"></div>
+  <div class="no-results" id="no-results" style="display:none">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <p>No questions match your search or filters.</p>
+  </div>
+</div>
+
+<footer>Zoho CRM Help Centre &mdash; For internal use only &mdash; <span id="footer-count"></span></footer>
+
+<script>
+// Pre-fill Supabase defaults if not already set
+const DEFAULT_SB_URL = 'https://lrccotdkoptqwehvsbvk.supabase.co';
+const DEFAULT_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxyY2NvdGRrb3B0cXdlaHZzYnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NDcyNjMsImV4cCI6MjA5MTIyMzI2M30.Za9MeR-E_W-x_7_eIGe6ZsQPDvMhBFN1SLlEcHRQPz4';
+if (!localStorage.getItem('sb_url')) localStorage.setItem('sb_url', DEFAULT_SB_URL);
+if (!localStorage.getItem('sb_key')) localStorage.setItem('sb_key', DEFAULT_SB_KEY);
+
+// ── DATA ── loaded from admin panel via localStorage ──────────────────────────
+const DEFAULT_FAQS = [
+  {id:1,topic:"leads",role:"both",q:"How do I add a new lead in Zoho CRM?",a:`<p>Go to <code>Leads</code> in the top navigation bar, then click <strong>+ New Lead</strong>. Fill in required fields (marked with *) and click <strong>Save</strong>.</p><ul><li>Required fields: Last Name, Company, Lead Source</li><li>Import in bulk via <code>Leads → Import</code></li></ul><div class="tip">Always check for duplicates before creating a new lead using <em>Find & Merge Duplicates</em>.</div>`,photo:""},
+  {id:2,topic:"leads",role:"agent",q:"How do I convert a lead to a contact or deal?",a:`<p>Open the lead record, click <strong>Convert</strong> at the top. You'll be prompted to create a Contact, Account, and/or Deal.</p><ul><li>Existing fields auto-map to the new records</li><li>The original lead is marked as <em>Converted</em></li></ul>`,photo:""},
+  {id:3,topic:"leads",role:"agent",q:"How do I assign a lead to myself or another agent?",a:`<p>Open the lead record and find the <strong>Lead Owner</strong> field. Click the pencil icon and select the desired user.</p><div class="tip">Use <code>Leads → Mass Update</code> to reassign multiple leads at once.</div>`,photo:""},
+  {id:4,topic:"leads",role:"lead",q:"How do I reassign leads in bulk across the team?",a:`<p>Go to <code>Leads</code>, select records via checkboxes, then click <strong>Actions → Mass Update</strong> and change the <em>Lead Owner</em> field.</p><ul><li>Only Manager or Admin roles can bulk reassign</li></ul>`,photo:""},
+  {id:5,topic:"leads",role:"both",q:"How do I search for a specific contact or lead?",a:`<p>Use the <strong>global search bar</strong> (magnifying glass icon) at the top. For precise results, use <strong>Advanced Search</strong> inside the module.</p><ul><li>Save frequent searches as <em>Custom Views</em></li></ul>`,photo:""},
+  {id:6,topic:"leads",role:"both",q:"What does each lead status mean?",a:`<p>Lead statuses track outreach progress:</p><ul><li><strong>New</strong> — not yet contacted</li><li><strong>Attempted to Contact</strong> — outreach sent, no reply</li><li><strong>Connected</strong> — successfully reached</li><li><strong>Junk Lead</strong> — irrelevant/spam</li><li><strong>Lost Lead</strong> — unresponsive or not interested</li></ul><div class="tip">Always update lead status after every interaction.</div>`,photo:""},
+  {id:7,topic:"leads",role:"lead",q:"How do I set up a lead assignment rule?",a:`<p>Go to <code>Setup → Automation → Assignment Rules</code>, select the Leads module, and click <strong>New Rule</strong>. Define conditions and assign matching records to users or teams.</p>`,photo:""},
+  {id:8,topic:"users",role:"lead",q:"How do I add a new user to our CRM?",a:`<p>Go to <code>Setup → Users & Control → Users</code> and click <strong>+ New User</strong>. Enter name, email, role, and profile, then save. An activation email is sent automatically.</p><div class="tip">Set the correct Role and Profile before saving — it controls access across the CRM.</div>`,photo:""},
+  {id:9,topic:"users",role:"lead",q:"What is the difference between a Role and a Profile?",a:`<p><strong>Profile</strong> — controls what a user <em>can do</em> (create, edit, delete, export).</p><p><strong>Role</strong> — controls what data a user <em>can see</em> based on hierarchy.</p><ul><li>Example Profile: Sales Agent, Manager, Admin</li><li>Example Role: South India → Mumbai Agent</li></ul>`,photo:""},
+  {id:10,topic:"users",role:"lead",q:"How do I change a user's role or profile?",a:`<p>Go to <code>Setup → Users & Control → Users</code>, click the user's name, then <strong>Edit</strong>. Update Role or Profile and save. Changes apply immediately.</p>`,photo:""},
+  {id:11,topic:"users",role:"lead",q:"How do I deactivate a user who has left the team?",a:`<p>Go to <code>Setup → Users & Control → Users</code>, find the user and click <strong>More → Deactivate</strong>. Data is preserved. Reassign open leads/deals first.</p><div class="tip">Never delete a user — deactivating preserves all historical data for reports.</div>`,photo:""},
+  {id:12,topic:"users",role:"both",q:"I can't see certain records — what should I do?",a:`<p>Record visibility is controlled by your Role. Options:</p><ul><li>Ask your Team Lead to share the record directly</li><li>Ask your Admin to review your Role permissions</li><li>Check if the record is in the correct module</li></ul>`,photo:""},
+  {id:13,topic:"data",role:"agent",q:"How do I edit a field value in a lead or contact?",a:`<p>Open the record and click <strong>Edit</strong> (top-right), or double-click a field for inline editing. Update the field and click <strong>Save</strong>.</p><ul><li>Some fields may be locked by your profile</li><li>Required fields must be filled before saving</li></ul>`,photo:""},
+  {id:14,topic:"data",role:"both",q:"What is a mandatory field and why can't I save without it?",a:`<p>Mandatory fields (marked with <code>*</code>) are required by your Admin to ensure data quality. The record can't be saved until all are filled.</p><p>If you don't have the information, use a placeholder like <em>Unknown</em> and update it later.</p>`,photo:""},
+  {id:15,topic:"data",role:"both",q:"How do I log a call, email, or note on a record?",a:`<p>Open the lead or contact, scroll to <strong>Activities / Timeline</strong> and click:</p><ul><li><strong>Log a Call</strong> — record call details and outcome</li><li><strong>Send Email</strong> — compose and log an email</li><li><strong>Add Note</strong> — write an internal team note</li></ul><div class="tip">Always log interactions to prevent double-outreach and keep pipeline reports accurate.</div>`,photo:""},
+  {id:16,topic:"data",role:"lead",q:"How do I create or customise a field in a module?",a:`<p>Go to <code>Setup → Customization → Modules & Fields</code>, select the module, click <strong>Fields → + New Field</strong>. Choose field type, configure it, save, and drag to position in the layout.</p>`,photo:""},
+  {id:17,topic:"data",role:"lead",q:"How do I add or edit picklist (dropdown) values?",a:`<p>Go to <code>Setup → Customization → Modules & Fields</code>, select the module, click the picklist field and choose <strong>Edit</strong>. Scroll to <em>Picklist Values</em> to add, rename, or reorder.</p><div class="tip">Don't delete values already in use — mark them <em>inactive</em> instead.</div>`,photo:""},
+  {id:18,topic:"data",role:"both",q:"How do I export data from Zoho CRM?",a:`<p>Go to the module, click <strong>Actions → Export</strong>. Choose fields and format (CSV or XLS). Only records visible to your role will be exported.</p>`,photo:""},
+  {id:19,topic:"leads",role:"lead",q:"How do I create a team or group in Zoho CRM?",a:`<p>Go to <code>Setup → Users & Control → Groups</code> and click <strong>+ New Group</strong>. Name the group, select members, and save. Groups can be used in assignment rules and report filtering.</p>`,photo:""}
+];
+
+function loadFAQs() {
+  try {
+    const saved = localStorage.getItem('zoho_faqs');
+    return saved ? JSON.parse(saved) : DEFAULT_FAQS;
+  } catch(e) { return DEFAULT_FAQS; }
+}
+
+let faqs = loadFAQs();
+let activeRoles = new Set(['agent','lead','both']);
+let activeTopic = 'all';
+
+const topicMeta = {
+  leads: { label: 'Leads & Contacts', icon: '👤', color: '#1D5C8A', bg: '#E8F1F8' },
+  users: { label: 'User & Role Management', icon: '🔐', color: '#1A6B45', bg: '#E6F4EE' },
+  data: { label: 'Data Entry & Fields', icon: '📋', color: '#4A3A8C', bg: '#EEEAF8' }
+};
+
+function toggleRole(role, el) {
+  if (activeRoles.has(role)) {
+    if (activeRoles.size === 1) return;
+    activeRoles.delete(role);
+    el.className = 'chip';
+  } else {
+    activeRoles.add(role);
+    el.className = `chip active-${role}`;
+  }
+  filterFAQ();
+}
+
+function setTopic(topic, el) {
+  activeTopic = topic;
+  document.querySelectorAll('[data-topic]').forEach(c => c.className = 'chip');
+  el.className = 'chip active-topic';
+  filterFAQ();
+}
+
+function filterFAQ() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const container = document.getElementById('faq-list');
+  const noRes = document.getElementById('no-results');
+
+  const grouped = { leads: [], users: [], data: [] };
+  faqs.forEach(f => {
+    if (!activeRoles.has(f.role)) return;
+    if (activeTopic !== 'all' && activeTopic !== f.topic) return;
+    if (q && !f.q.toLowerCase().includes(q) && !f.a.toLowerCase().includes(q)) return;
+    grouped[f.topic].push(f);
+  });
+
+  const keys = activeTopic === 'all' ? ['leads','users','data'] : [activeTopic];
+  let html = '';
+  let total = 0;
+
+  keys.forEach(k => {
+    if (!grouped[k] || !grouped[k].length) return;
+    const m = topicMeta[k];
+    total += grouped[k].length;
+    html += `<div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:${m.bg};color:${m.color}">${m.icon}</div>
+        <span class="section-title">${m.label}</span>
+        <span class="section-count">${grouped[k].length} article${grouped[k].length>1?'s':''}</span>
+      </div>`;
+    grouped[k].forEach(f => {
+      const badgeClass = `badge-${f.role}`;
+      const badgeLabel = f.role === 'agent' ? 'Agent' : f.role === 'lead' ? 'Team Lead' : 'Both';
+      const photoHtml = f.photo
+        ? `<img class="faq-photo" src="${f.photo}" alt="" onerror="this.style.display='none'">`
+        : `<div class="faq-photo-placeholder">?</div>`;
+      const imgSection = f.photo ? `<div class="faq-img-wrap"><img src="${f.photo}" alt="FAQ image"></div>` : '';
+      html += `<div class="faq-card">
+        <div class="faq-q" onclick="toggle(this)">
+          ${photoHtml}
+          <span class="role-badge ${badgeClass}">${badgeLabel}</span>
+          <span class="faq-q-text">${f.q}</span>
+          <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+        <div class="faq-a">
+          <div class="faq-a-inner">${f.a}${imgSection}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+  noRes.style.display = total === 0 ? 'block' : 'none';
+
+  document.getElementById('faq-count-badge').textContent = `${total} article${total!==1?'s':''}`;
+  document.getElementById('footer-count').textContent = `${total} article${total!==1?'s':''}`;
+  renderStats(grouped, keys);
+}
+
+function renderStats(grouped, keys) {
+  let total = 0, agents = 0, leads = 0, both = 0;
+  keys.forEach(k => {
+    (grouped[k]||[]).forEach(f => {
+      total++;
+      if(f.role==='agent') agents++;
+      else if(f.role==='lead') leads++;
+      else both++;
+    });
+  });
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat"><div class="stat-num">${total}</div><div class="stat-label">Total Articles</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--accent)">${agents}</div><div class="stat-label">Agent Tips</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--green)">${leads}</div><div class="stat-label">Lead Tips</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--purple)">${both}</div><div class="stat-label">Shared</div></div>
+  `;
+}
+
+function toggle(el) {
+  const ans = el.nextElementSibling;
+  const chev = el.querySelector('.faq-chevron');
+  ans.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+// Listen for updates from admin panel
+window.addEventListener('storage', e => {
+  if (e.key === 'zoho_faqs') { faqs = loadFAQs(); filterFAQ(); }
+});
+
+
+// ── LEAD LOOKUP ────────────────────────────────────────────────────────────────
+
+function saveToken() {
+  const t = document.getElementById('zoho-token-input').value.trim();
+  if (!t) return;
+  localStorage.setItem('zoho_access_token', t);
+  document.getElementById('token-setup-wrap').style.display = 'none';
+  showToast('Token saved. You can now search leads.');
+}
+
+function getToken() {
+  return localStorage.getItem('zoho_access_token') || '';
+}
+
+function initTokenSetup() {
+  const wrap = document.getElementById('token-setup-wrap');
+  if (getToken()) {
+    wrap.style.display = 'none';
+  }
+}
+
+function showToast(msg) {
+  let t = document.getElementById('lu-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'lu-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1A1814;color:white;padding:12px 20px;border-radius:10px;font-size:13px;z-index:999;transition:all 0.25s;opacity:0;transform:translateY(8px);pointer-events:none;font-family:DM Sans,sans-serif';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1'; t.style.transform = 'translateY(0)';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(8px)'; }, 3000);
+}
+
+function getStatusClass(status) {
+  if (!status) return 'status-other';
+  const s = status.toLowerCase();
+  if (s === 'new') return 'status-new';
+  if (s.includes('connect')) return 'status-connected';
+  if (s.includes('attempt')) return 'status-attempted';
+  return 'status-other';
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  try {
+    return new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  } catch(e) { return dateStr; }
+}
+
+function renderLeadCard(lead) {
+  const name = [lead.First_Name, lead.Last_Name].filter(Boolean).join(' ') || 'Unknown';
+  const company = lead.Company || '—';
+  const status = lead.Lead_Status || lead.Status || 'Unknown';
+  const email = lead.Email || '—';
+  const phone = lead.Phone || lead.Mobile || '—';
+  const owner = lead.Owner ? (lead.Owner.name || lead.Owner) : '—';
+  const created = formatDate(lead.Created_Time);
+  const source = lead.Lead_Source || '—';
+  const statusClass = getStatusClass(status);
+
+  return `<div class="lead-card">
+    <div class="lead-card-top">
+      <div>
+        <div class="lead-name">${name}</div>
+        <div class="lead-company">${company}</div>
+      </div>
+      <span class="lead-status-pill ${statusClass}">${status}</span>
+    </div>
+    <div class="lead-meta">
+      <div class="lead-meta-item">
+        <span class="meta-label">Email</span>
+        <span class="meta-value">${email}</span>
+      </div>
+      <div class="lead-meta-item">
+        <span class="meta-label">Phone</span>
+        <span class="meta-value">${phone}</span>
+      </div>
+      <div class="lead-meta-item">
+        <span class="meta-label">Source</span>
+        <span class="meta-value">${source}</span>
+      </div>
+      <div class="lead-meta-item">
+        <span class="meta-label">Owner</span>
+        <span class="meta-value highlight">${owner}</span>
+      </div>
+      <div class="lead-meta-item">
+        <span class="meta-label">Created</span>
+        <span class="meta-value">${created}</span>
+      </div>
+      <div class="lead-meta-item">
+        <span class="meta-label">Lead ID</span>
+        <span class="meta-value" style="font-size:11px">${lead.id || '—'}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function lookupLeads() {
+  const customerId = document.getElementById('customer-id-input').value.trim();
+  if (!customerId) {
+    document.getElementById('lead-results-wrap').innerHTML =
+      `<div class="lookup-error"><span>⚠</span> Please enter a Customer ID to search.</div>`;
+    return;
+  }
+
+  const token = getToken();
+  if (!token) {
+    document.getElementById('token-setup-wrap').style.display = 'block';
+    document.getElementById('lead-results-wrap').innerHTML =
+      `<div class="lookup-error"><span>🔑</span> No access token found. Please set up your Zoho CRM token above.</div>`;
+    return;
+  }
+
+  const btn = document.getElementById('lookup-btn');
+  btn.disabled = true;
+  btn.innerHTML = `<div class="spinner" style="width:14px;height:14px;margin:0;border-width:2px"></div> Searching…`;
+
+  document.getElementById('lead-results-wrap').innerHTML =
+    `<div class="lookup-loading"><div class="spinner"></div>Fetching active leads for Customer ID <strong>${customerId}</strong>…</div>`;
+
+  // Date filter: 15 Oct 2025 → today
+  const fromDate = '2025-10-15T00:00:00+05:30';
+  const toDate   = new Date().toISOString();
+
+  // Zoho CRM COQL query with filters
+  // Expired checkbox false, Created_Time in range, Customer_ID matches
+  const coql = `SELECT id, First_Name, Last_Name, Company, Email, Phone, Mobile, Lead_Status, Lead_Source, Owner, Created_Time FROM Leads WHERE (Expired = false AND Created_Time >= '${fromDate}' AND Created_Time <= '${toDate}' AND Customer_ID = '${customerId}') LIMIT 50`;
+
+  const BASE = 'https://www.zohoapis.in/crm/v6';
+
+  try {
+    const res = await fetch(`${BASE}/coql`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Zoho-oauthtoken ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ select_query: coql })
+    });
+
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Leads`;
+
+    if (res.status === 401) {
+      document.getElementById('lead-results-wrap').innerHTML =
+        `<div class="lookup-error">⚠ Access token expired or invalid. Please update your token above.</div>`;
+      document.getElementById('token-setup-wrap').style.display = 'block';
+      return;
+    }
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      const msg = errData?.message || `HTTP ${res.status}`;
+      document.getElementById('lead-results-wrap').innerHTML =
+        `<div class="lookup-error">⚠ Zoho API error: ${msg}</div>`;
+      return;
+    }
+
+    const data = await res.json();
+    const leads = data.data || [];
+
+    if (!leads.length) {
+      document.getElementById('lead-results-wrap').innerHTML = `
+        <div class="lookup-empty">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <p>No active leads found for Customer ID <strong>${customerId}</strong></p>
+          <p style="font-size:12px;margin-top:6px">Filters: Expired = false · Created 15 Oct 2025 → today</p>
+        </div>`;
+      return;
+    }
+
+    document.getElementById('lead-results-wrap').innerHTML = `
+      <div class="lead-results">
+        <div class="lead-results-header">
+          <span class="results-title">Active leads for Customer ID: <strong>${customerId}</strong></span>
+          <span class="results-count">${leads.length} lead${leads.length!==1?'s':''}</span>
+        </div>
+        <div class="lead-grid">${leads.map(renderLeadCard).join('')}</div>
+      </div>`;
+
+  } catch(err) {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Leads`;
+
+    // CORS fallback — build a deep-link to Zoho CRM search instead
+    document.getElementById('lead-results-wrap').innerHTML = `
+      <div class="lookup-error" style="flex-direction:column;gap:8px">
+        <div>⚠ <strong>CORS restriction:</strong> Your browser is blocking direct API calls to Zoho CRM from a local file. This is normal when running the page locally.</div>
+        <div style="font-size:12px;margin-top:4px">
+          <strong>Options to fix:</strong><br>
+          1. Host both files on a server (Netlify, GitHub Pages) — CORS will work with a proper domain.<br>
+          2. Or <a href="https://crm.zoho.in/crm/org${customerId}/search?searchword=${encodeURIComponent(customerId)}&module=Leads" target="_blank" style="color:var(--accent)">open Zoho CRM search for this ID ↗</a>
+        </div>
+      </div>`;
+  }
+}
+
+// Init on load
+initTokenSetup();
+
+</body>
+</html>
