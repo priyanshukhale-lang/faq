@@ -484,6 +484,8 @@
   <span class="nav-badge" id="faq-count-badge">19 articles</span>
 </nav>
 
+<div id="sb-debug" style="background:#1A1814;color:#9FE1CB;font-family:monospace;font-size:11px;padding:6px 16px;text-align:center;position:sticky;top:60px;z-index:99">Connecting to Supabase…</div>
+
 <div class="hero">
   <div class="hero-tag">Internal Knowledge Base</div>
   <h1>How can we help you today?</h1>
@@ -576,43 +578,57 @@
 <footer>Zoho CRM Help Centre &mdash; For internal use only &mdash; <span id="footer-count"></span></footer>
 
 <script>
-// Pre-fill Supabase defaults if not already set
-const DEFAULT_SB_URL = 'https://lrccotdkoptqwehvsbvk.supabase.co';
-const DEFAULT_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxyY2NvdGRrb3B0cXdlaHZzYnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NDcyNjMsImV4cCI6MjA5MTIyMzI2M30.Za9MeR-E_W-x_7_eIGe6ZsQPDvMhBFN1SLlEcHRQPz4';
-if (!localStorage.getItem('sb_url')) localStorage.setItem('sb_url', DEFAULT_SB_URL);
-if (!localStorage.getItem('sb_key')) localStorage.setItem('sb_key', DEFAULT_SB_KEY);
+// Pre-fill Supabase defaults
+const SB_URL = 'https://lrccotdkoptqwehvsbvk.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxyY2NvdGRrb3B0cXdlaHZzYnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NDcyNjMsImV4cCI6MjA5MTIyMzI2M30.Za9MeR-E_W-x_7_eIGe6ZsQPDvMhBFN1SLlEcHRQPz4';
 
-// ── DATA ── loaded from admin panel via localStorage ──────────────────────────
+// ── DATA ── loaded from Supabase ──────────────────────────
 const DEFAULT_FAQS = [
   {id:1,topic:"leads",role:"both",q:"How do I add a new lead in Zoho CRM?",a:`<p>Go to <code>Leads</code> in the top navigation bar, then click <strong>+ New Lead</strong>. Fill in required fields (marked with *) and click <strong>Save</strong>.</p><ul><li>Required fields: Last Name, Company, Lead Source</li><li>Import in bulk via <code>Leads → Import</code></li></ul><div class="tip">Always check for duplicates before creating a new lead using <em>Find & Merge Duplicates</em>.</div>`,photo:""},
   {id:2,topic:"leads",role:"agent",q:"How do I convert a lead to a contact or deal?",a:`<p>Open the lead record, click <strong>Convert</strong> at the top. You'll be prompted to create a Contact, Account, and/or Deal.</p><ul><li>Existing fields auto-map to the new records</li><li>The original lead is marked as <em>Converted</em></li></ul>`,photo:""},
   {id:3,topic:"leads",role:"agent",q:"How do I assign a lead to myself or another agent?",a:`<p>Open the lead record and find the <strong>Lead Owner</strong> field. Click the pencil icon and select the desired user.</p><div class="tip">Use <code>Leads → Mass Update</code> to reassign multiple leads at once.</div>`,photo:""},
-  {id:4,topic:"leads",role:"lead",q:"How do I reassign leads in bulk across the team?",a:`<p>Go to <code>Leads</code>, select records via checkboxes, then click <strong>Actions → Mass Update</strong> and change the <em>Lead Owner</em> field.</p><ul><li>Only Manager or Admin roles can bulk reassign</li></ul>`,photo:""},
-  {id:5,topic:"leads",role:"both",q:"How do I search for a specific contact or lead?",a:`<p>Use the <strong>global search bar</strong> (magnifying glass icon) at the top. For precise results, use <strong>Advanced Search</strong> inside the module.</p><ul><li>Save frequent searches as <em>Custom Views</em></li></ul>`,photo:""},
-  {id:6,topic:"leads",role:"both",q:"What does each lead status mean?",a:`<p>Lead statuses track outreach progress:</p><ul><li><strong>New</strong> — not yet contacted</li><li><strong>Attempted to Contact</strong> — outreach sent, no reply</li><li><strong>Connected</strong> — successfully reached</li><li><strong>Junk Lead</strong> — irrelevant/spam</li><li><strong>Lost Lead</strong> — unresponsive or not interested</li></ul><div class="tip">Always update lead status after every interaction.</div>`,photo:""},
-  {id:7,topic:"leads",role:"lead",q:"How do I set up a lead assignment rule?",a:`<p>Go to <code>Setup → Automation → Assignment Rules</code>, select the Leads module, and click <strong>New Rule</strong>. Define conditions and assign matching records to users or teams.</p>`,photo:""},
-  {id:8,topic:"users",role:"lead",q:"How do I add a new user to our CRM?",a:`<p>Go to <code>Setup → Users & Control → Users</code> and click <strong>+ New User</strong>. Enter name, email, role, and profile, then save. An activation email is sent automatically.</p><div class="tip">Set the correct Role and Profile before saving — it controls access across the CRM.</div>`,photo:""},
-  {id:9,topic:"users",role:"lead",q:"What is the difference between a Role and a Profile?",a:`<p><strong>Profile</strong> — controls what a user <em>can do</em> (create, edit, delete, export).</p><p><strong>Role</strong> — controls what data a user <em>can see</em> based on hierarchy.</p><ul><li>Example Profile: Sales Agent, Manager, Admin</li><li>Example Role: South India → Mumbai Agent</li></ul>`,photo:""},
-  {id:10,topic:"users",role:"lead",q:"How do I change a user's role or profile?",a:`<p>Go to <code>Setup → Users & Control → Users</code>, click the user's name, then <strong>Edit</strong>. Update Role or Profile and save. Changes apply immediately.</p>`,photo:""},
-  {id:11,topic:"users",role:"lead",q:"How do I deactivate a user who has left the team?",a:`<p>Go to <code>Setup → Users & Control → Users</code>, find the user and click <strong>More → Deactivate</strong>. Data is preserved. Reassign open leads/deals first.</p><div class="tip">Never delete a user — deactivating preserves all historical data for reports.</div>`,photo:""},
-  {id:12,topic:"users",role:"both",q:"I can't see certain records — what should I do?",a:`<p>Record visibility is controlled by your Role. Options:</p><ul><li>Ask your Team Lead to share the record directly</li><li>Ask your Admin to review your Role permissions</li><li>Check if the record is in the correct module</li></ul>`,photo:""},
-  {id:13,topic:"data",role:"agent",q:"How do I edit a field value in a lead or contact?",a:`<p>Open the record and click <strong>Edit</strong> (top-right), or double-click a field for inline editing. Update the field and click <strong>Save</strong>.</p><ul><li>Some fields may be locked by your profile</li><li>Required fields must be filled before saving</li></ul>`,photo:""},
-  {id:14,topic:"data",role:"both",q:"What is a mandatory field and why can't I save without it?",a:`<p>Mandatory fields (marked with <code>*</code>) are required by your Admin to ensure data quality. The record can't be saved until all are filled.</p><p>If you don't have the information, use a placeholder like <em>Unknown</em> and update it later.</p>`,photo:""},
-  {id:15,topic:"data",role:"both",q:"How do I log a call, email, or note on a record?",a:`<p>Open the lead or contact, scroll to <strong>Activities / Timeline</strong> and click:</p><ul><li><strong>Log a Call</strong> — record call details and outcome</li><li><strong>Send Email</strong> — compose and log an email</li><li><strong>Add Note</strong> — write an internal team note</li></ul><div class="tip">Always log interactions to prevent double-outreach and keep pipeline reports accurate.</div>`,photo:""},
-  {id:16,topic:"data",role:"lead",q:"How do I create or customise a field in a module?",a:`<p>Go to <code>Setup → Customization → Modules & Fields</code>, select the module, click <strong>Fields → + New Field</strong>. Choose field type, configure it, save, and drag to position in the layout.</p>`,photo:""},
-  {id:17,topic:"data",role:"lead",q:"How do I add or edit picklist (dropdown) values?",a:`<p>Go to <code>Setup → Customization → Modules & Fields</code>, select the module, click the picklist field and choose <strong>Edit</strong>. Scroll to <em>Picklist Values</em> to add, rename, or reorder.</p><div class="tip">Don't delete values already in use — mark them <em>inactive</em> instead.</div>`,photo:""},
-  {id:18,topic:"data",role:"both",q:"How do I export data from Zoho CRM?",a:`<p>Go to the module, click <strong>Actions → Export</strong>. Choose fields and format (CSV or XLS). Only records visible to your role will be exported.</p>`,photo:""},
-  {id:19,topic:"leads",role:"lead",q:"How do I create a team or group in Zoho CRM?",a:`<p>Go to <code>Setup → Users & Control → Groups</code> and click <strong>+ New Group</strong>. Name the group, select members, and save. Groups can be used in assignment rules and report filtering.</p>`,photo:""}
+  {id:4,topic:"leads",role:"lead",q:"How do I reassign leads in bulk across the team?",a:`<p>Go to <code>Leads</code>, select records via checkboxes, then click <strong>Actions → Mass Update</strong> and change the <em>Lead Owner</em> field.</p>`,photo:""},
+  {id:5,topic:"leads",role:"both",q:"How do I search for a specific contact or lead?",a:`<p>Use the <strong>global search bar</strong> at the top. For precise results, use <strong>Advanced Search</strong> inside the module.</p>`,photo:""},
+  {id:6,topic:"leads",role:"both",q:"What does each lead status mean?",a:`<p>Lead statuses:</p><ul><li><strong>New</strong> — not yet contacted</li><li><strong>Attempted to Contact</strong> — outreach sent, no reply</li><li><strong>Connected</strong> — successfully reached</li><li><strong>Junk Lead</strong> — irrelevant/spam</li></ul>`,photo:""},
+  {id:7,topic:"users",role:"lead",q:"How do I add a new user to our CRM?",a:`<p>Go to <code>Setup → Users & Control → Users</code> and click <strong>+ New User</strong>.</p>`,photo:""},
+  {id:8,topic:"data",role:"both",q:"How do I log a call, email, or note on a record?",a:`<p>Open the lead or contact, scroll to <strong>Activities / Timeline</strong> and click Log a Call, Send Email, or Add Note.</p>`,photo:""},
 ];
 
-function loadFAQs() {
-  try {
-    const saved = localStorage.getItem('zoho_faqs');
-    return saved ? JSON.parse(saved) : DEFAULT_FAQS;
-  } catch(e) { return DEFAULT_FAQS; }
-}
+let faqs = [];
+let activeRoles = new Set(['agent','lead','both']);
+let activeTopic = 'all';
 
-let faqs = loadFAQs();
+async function loadFAQsFromSupabase() {
+  const debugEl = document.getElementById('sb-debug');
+  if (debugEl) debugEl.textContent = 'Fetching from Supabase…';
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/faqs?select=*&order=id.asc`, {
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    const text = await res.text();
+    if (debugEl) debugEl.textContent = `Status: ${res.status} | Response: ${text.substring(0,200)}`;
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${text}`);
+    const rows = JSON.parse(text);
+    if (rows && rows.length > 0) {
+      faqs = rows.map(r => ({ id:r.id, topic:r.topic, role:r.role, q:r.question, a:r.answer, photo:r.photo||'' }));
+      if (debugEl) debugEl.textContent = `✓ Loaded ${faqs.length} FAQs from Supabase`;
+    } else {
+      if (debugEl) debugEl.textContent = '⚠ Table is empty — using defaults';
+      faqs = DEFAULT_FAQS;
+    }
+  } catch(e) {
+    if (debugEl) debugEl.textContent = `✗ Error: ${e.message}`;
+    try {
+      const saved = localStorage.getItem('zoho_faqs');
+      faqs = saved ? JSON.parse(saved).map(f=>({...f,q:f.question||f.q,a:f.answer||f.a})) : DEFAULT_FAQS;
+    } catch(e2) { faqs = DEFAULT_FAQS; }
+  }
+  filterFAQ();
+}
 let activeRoles = new Set(['agent','lead','both']);
 let activeTopic = 'all';
 
@@ -725,7 +741,7 @@ function toggle(el) {
 
 // Listen for updates from admin panel
 window.addEventListener('storage', e => {
-  if (e.key === 'zoho_faqs') { faqs = loadFAQs(); filterFAQ(); }
+  if (e.key === 'zoho_faqs') { loadFAQsFromSupabase(); }
 });
 
 
@@ -930,6 +946,7 @@ async function lookupLeads() {
 
 // Init on load
 initTokenSetup();
+loadFAQsFromSupabase();
 
 </body>
 </html>
