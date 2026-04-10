@@ -629,8 +629,6 @@ async function loadFAQsFromSupabase() {
   }
   filterFAQ();
 }
-let activeRoles = new Set(['agent','lead','both']);
-let activeTopic = 'all';
 
 const topicMeta = {
   leads: { label: 'Leads & Contacts', icon: '👤', color: '#1D5C8A', bg: '#E8F1F8' },
@@ -945,8 +943,10 @@ async function lookupLeads() {
 }
 
 // Init on load
-initTokenSetup();
-loadFAQsFromSupabase();
-
+document.addEventListener('DOMContentLoaded', async () => {
+  initTokenSetup();
+  await loadFAQsFromSupabase();
+});
+</script>
 </body>
 </html>
