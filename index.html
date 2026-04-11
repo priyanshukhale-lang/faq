@@ -6,7 +6,7 @@
 <title>Zoho CRM Help Centre</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root { 
+  :root {
     --bg: #F7F5F0;
     --surface: #FFFFFF;
     --ink: #1A1814;
@@ -943,16 +943,23 @@ async function lookupLeads() {
     btn.disabled = false;
     btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Leads`;
 
-    // CORS fallback — build a deep-link to Zoho CRM search instead
-    document.getElementById('lead-results-wrap').innerHTML = `
-      <div class="lookup-error" style="flex-direction:column;gap:8px">
-        <div>⚠ <strong>CORS restriction:</strong> Your browser is blocking direct API calls to Zoho CRM from a local file. This is normal when running the page locally.</div>
-        <div style="font-size:12px;margin-top:4px">
-          <strong>Options to fix:</strong><br>
-          1. Host both files on a server (Netlify, GitHub Pages) — CORS will work with a proper domain.<br>
-          2. Or <a href="https://crm.zoho.in/crm/org${customerId}/search?searchword=${encodeURIComponent(customerId)}&module=Leads" target="_blank" style="color:var(--accent)">open Zoho CRM search for this ID ↗</a>
-        </div>
-      </div>`;
+    const isLocal = window.location.protocol === 'file:';
+    if (isLocal) {
+      document.getElementById('lead-results-wrap').innerHTML = `
+        <div class="lookup-error" style="flex-direction:column;gap:8px">
+          <div>⚠ <strong>CORS restriction:</strong> Open this page from your Vercel URL, not a local file.</div>
+          <div style="font-size:12px">Go to <strong>https://admin-liart-six-50.vercel.app/</strong></div>
+        </div>`;
+    } else {
+      document.getElementById('lead-results-wrap').innerHTML = `
+        <div class="lookup-error" style="flex-direction:column;gap:8px">
+          <div>⚠ <strong>Error:</strong> ${err.message}</div>
+          <div style="font-size:12px;margin-top:4px">
+            Make sure your Zoho access token is active in the admin panel.<br>
+            Go to <a href="/admin.html" style="color:var(--accent)">admin panel → API & Database → Refresh Token ↗</a>
+          </div>
+        </div>`;
+    }
   }
 }
 
