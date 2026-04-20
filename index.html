@@ -446,22 +446,7 @@
     border-radius: 10px; padding: 1rem 1.25rem;
     color: #991B1B; font-size: 13px; display: flex; gap: 10px; align-items: flex-start;
   }
-  .lookup-token-wrap {
-    margin-bottom: 1.25rem; padding: 1rem 1.25rem;
-    background: #FEF3E2; border: 1px solid #FDE68A;
-    border-radius: 10px; font-size: 13px; color: #78350F;
-  }
-  .lookup-token-wrap input {
-    margin-top: 8px; width: 100%; padding: 8px 12px;
-    font-size: 13px; font-family: 'DM Sans', sans-serif;
-    border: 1.5px solid #FDE68A; border-radius: 8px;
-    background: white; color: var(--ink); outline: none;
-  }
-  .token-save-btn {
-    margin-top: 8px; padding: 7px 16px; background: #92510A;
-    color: white; border: none; border-radius: 7px; font-size: 12px;
-    font-family: 'DM Sans', sans-serif; cursor: pointer; font-weight: 500;
-  }
+  /* token setup wrap removed — managed via Supabase */
 
   @media (max-width: 600px) {
     .hero { padding: 2.5rem 1rem 2rem; }
@@ -511,12 +496,7 @@
     </div>
 
     <!-- Token setup (only shown if no token saved) -->
-    <div class="lookup-token-wrap" id="token-setup-wrap" style="display:none">
-      <strong>Setup required:</strong> Enter your Zoho CRM OAuth Access Token to enable live lead lookup.
-      <input type="password" id="zoho-token-input" placeholder="Paste your Zoho CRM access_token here…">
-      <button class="token-save-btn" onclick="saveToken()">Save Token</button>
-      <div style="margin-top:6px;font-size:11px;opacity:0.7">Token is stored in your browser only. Get it from: Zoho API Console → OAuth → Access Token.</div>
-    </div>
+    <div id="token-setup-wrap" style="display:none"></div>
 
     <div class="lookup-form">
       <div class="lookup-field">
@@ -745,24 +725,21 @@ window.addEventListener('storage', e => {
 
 // ── LEAD LOOKUP ────────────────────────────────────────────────────────────────
 
-function saveToken() {
-  const t = document.getElementById('zoho-token-input').value.trim();
-  if (!t) return;
-  localStorage.setItem('zoho_access_token', t);
-  document.getElementById('token-setup-wrap').style.display = 'none';
-  showToast('Token saved. You can now search leads.');
+// ── GET TOKEN FROM SUPABASE ONLY ─────────────────
+async function getActiveToken() {
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/zoho_tokens?id=eq.1&select=access_token,expires_at`, {
+      headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
+    });
+    const rows = await res.json();
+    if (rows && rows.length > 0 && rows[0].access_token && rows[0].access_token !== '') {
+      return rows[0].access_token;
+    }
+  } catch(e) { console.error('Token fetch error:', e.message); }
+  return '';
 }
 
-function getToken() {
-  return localStorage.getItem('zoho_access_token') || '';
-}
-
-function initTokenSetup() {
-  const wrap = document.getElementById('token-setup-wrap');
-  if (getToken()) {
-    wrap.style.display = 'none';
-  }
-}
+function initTokenSetup() { /* no-op — token managed via Supabase */ }
 
 function showToast(msg) {
   let t = document.getElementById('lu-toast');
@@ -868,7 +845,7 @@ async function lookupLeads() {
   const token = await getActiveToken();
   if (!token) {
     document.getElementById('lead-results-wrap').innerHTML =
-      `<div class="lookup-error"><span>🔑</span> No access token found. Please ask your admin to activate the Zoho token in the admin panel.</div>`;
+      `<div class="lookup-error"><span>⚠</span> Access token not available. Please contact your admin to update the Zoho token.</div>`;
     return;
   }
 
