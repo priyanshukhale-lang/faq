@@ -289,41 +289,40 @@ function showErrorPopup(title, detail) {
 // ── LEAD LOOKUP ───────────────────────────────────────────────
 async function searchLead(inputValue, accessToken) {
   inputValue = inputValue.trim();
+
   let searchField = '';
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^[0-9]{10,15}$/;
-  if (emailRegex.test(inputValue))      searchField = 'Email';
-  else if (phoneRegex.test(inputValue)) searchField = 'Phone';
-  else                                   searchField = 'Customer_ID';
 
-  const fromDate = '2026-10-15T00:00:00+05:30';
-  const toDate   = new Date().toISOString();
+  if (emailRegex.test(inputValue)) searchField = 'Email';
+  else if (phoneRegex.test(inputValue)) searchField = 'Phone';
+  else searchField = 'Customer_ID';
 
   const query = `
-    select id, Last_Name, Phone, Owner, Agent_Assigned_Time, Call_connected_with,
-    Owner.email, First_Activity_Done_by, Working_Agent, Lead_Status, UCID_Number,
-    Sub_Lead_Status, Lead_Queue_Status, Inbound_Call_Count, East_Coast_Route,
-    Lead_Source, Expired, Inbound_Call_Count1, L1_Auto_OB_Call_Count,
-    L1_Manual_Call_Count, L1_Rechurn_Call_Count, L2_Auto_OB_Call_Count,
-    L2_Manual_Call_Count, L2_Rechurn_Call_Count, L2_Inbond_Call_Count,
-    L1_Inbond_Call_Count, Manual_Call_Count, Auto_OB_Call_Count, Call_ID
+    select id, Last_Name, Phone, Owner,
+    Lead_Status, Sub_Lead_Status, Lead_Queue_Status,
+    Inbound_Call_Count, Lead_Source, Call_ID
     from Leads
     where (
-      (${searchField} = '${inputValue}' AND Lead_Status != 'Contacted')
-      AND (Lead_Queue_Status != 'Disqualified' AND Lead_Queue_Status != 'DISQUALIFIED LEADS')
-      AND (Created_Time between '${fromDate}' and '${toDate}' AND Expired = false)
+      ${searchField} = '${inputValue}'
+      AND Lead_Status != 'Contacted'
+      AND Lead_Queue_Status != 'Disqualified'
+      AND Expired = false
     )
-    ORDER BY Created_Time DESC
+    order by Created_Time desc
     limit 1
   `;
 
-  const res = await fetch('https://www.zohoapis.in/crm/v7/coql', {
+  // 🔥 CALL YOUR BACKEND INSTEAD OF ZOHO
+  const res = await fetch('/api/zoho', {
     method: 'POST',
     headers: {
-      'Authorization': `Zoho-oauthtoken ${accessToken}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ select_query: query })
+    body: JSON.stringify({
+      query: query,
+      token: accessToken
+    })
   });
 
   const data = await res.json();
