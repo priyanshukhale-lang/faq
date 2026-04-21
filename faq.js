@@ -300,24 +300,7 @@ const toDate = new Date().toISOString();
   else searchField = 'Customer_ID';
 
 const safeValue = inputValue.replace(/'/g, "\\'");
-
-const query = `
-select id, Last_Name, Phone, Owner, Agent_Assigned_Time, Call_connected_with,
-First_Activity_Done_by, Working_Agent, Lead_Status, UCID_Number,
-Sub_Lead_Status, Lead_Queue_Status, Inbound_Call_Count, East_Coast_Route,
-Lead_Source, Expired, Inbound_Call_Count1, L1_Auto_OB_Call_Count,
-L1_Manual_Call_Count, L1_Rechurn_Call_Count, L2_Auto_OB_Call_Count,
-L2_Manual_Call_Count, L2_Rechurn_Call_Count, L2_Inbond_Call_Count,
-L1_Inbond_Call_Count, Manual_Call_Count, Auto_OB_Call_Count, Call_ID
-from Leads
-where (
-  (${searchField} = '${safeValue}' AND Lead_Status != 'Contacted')
-  AND (Lead_Queue_Status != 'Disqualified' AND Lead_Queue_Status != 'DISQUALIFIED LEADS')
-  AND (Created_Time between '${fromDate}' and '${toDate}' AND Expired = false)
-)
-ORDER BY Created_Time DESC
-LIMIT 1
-`;
+const query = `select id, Last_Name, Phone, Owner, Agent_Assigned_Time, Call_connected_with, First_Activity_Done_by, Working_Agent, Lead_Status, UCID_Number, Sub_Lead_Status, Lead_Queue_Status, Inbound_Call_Count, East_Coast_Route, Lead_Source, Expired, Inbound_Call_Count1, L1_Auto_OB_Call_Count, L1_Manual_Call_Count, L1_Rechurn_Call_Count, L2_Auto_OB_Call_Count, L2_Manual_Call_Count, L2_Rechurn_Call_Count, L2_Inbond_Call_Count, L1_Inbond_Call_Count, Manual_Call_Count, Auto_OB_Call_Count, Call_ID from Leads where ((${searchField} = '${safeValue}' AND Lead_Status != 'Contacted') AND (Lead_Queue_Status != 'Disqualified' AND Lead_Queue_Status != 'DISQUALIFIED LEADS') AND (Created_Time between '${fromDate}' and '${toDate}' AND Expired = false)) ORDER BY Created_Time DESC LIMIT 1`;
 console.log("QUERY:", query);
   const res = await fetch('/api/zoho', {
     method: 'POST',
