@@ -168,7 +168,7 @@ window.addEventListener('storage', e => {
 // ── GET TOKEN FROM SUPABASE ONLY ─────────────────
 async function getActiveToken() {
   try {
-    const res = await fetch(`${SB_URL}/rest/v1/zoho_tokens?id=eq.1&select=access_token,expires_at`, {
+    const res = await fetch(`${SB_URL}/rest/v1/zoho_tokens?id=eq.1&select=access_token`, {
       headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
     });
     const rows = await res.json();
@@ -252,7 +252,7 @@ function renderLeadCard(lead) {
 async function getActiveToken() {
   // Always fetch latest token from Supabase — admin panel keeps it fresh every 29 min
   try {
-    const res = await fetch(`${SB_URL}/rest/v1/zoho_tokens?id=eq.1&select=access_token,expires_at`, {
+    const res = await fetch(`${SB_URL}/rest/v1/zoho_tokens?id=eq.1&select=access_token`, {
       headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
     });
     const rows = await res.json();
