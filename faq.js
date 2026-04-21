@@ -311,7 +311,7 @@ from Leads
 where 
  (((${searchField} = '${inputValue}'  and Lead_Status != 'Contacted') and (Lead_Queue_Status != 'Disqualified' and Lead_Queue_Status != 'DISQUALIFIED LEADS'))
  and (Created_Time between  '${fromDate}' and '${toDate}' and Expired = false)) ORDER BY Created_Time DESC limit 1" ORDER BY Created_Time DESC
-limit 1
+limit 1)
 `;
   // 🔥 CALL YOUR BACKEND INSTEAD OF ZOHO
   const res = await fetch('/api/zoho', {
