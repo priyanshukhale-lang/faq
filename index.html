@@ -501,8 +501,8 @@
     <div class="lookup-form">
       <div class="lookup-field">
         <label>Customer ID</label>
-        <input class="lookup-input" id="customer-id-input" type="text" placeholder="e.g. 738291004" maxlength="40"
-          onkeydown="if(event.key==='Enter')lookupLeads()">
+        <input class="lookup-input" id="customer-id-input" type="text" placeholder="Customer ID, phone number, or email" maxlength="100"
+        onkeydown="if(event.key==='Enter')lookupLeads()">
       </div>
       <button class="lookup-btn" id="lookup-btn" onclick="lookupLeads()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -560,7 +560,8 @@
 <script>
 // Pre-fill Supabase defaults
 const SB_URL = 'https://lrccotdkoptqwehvsbvk.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxyY2NvdGRrb3B0cXdlaHZzYnZrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTY0NzI2MywiZXhwIjoyMDkxMjIzMjYzfQ.OmPfVuOXgjvr9jf5K7LXGYBZabhpwTSt7J1eND2x30c'
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxyY2NvdGRrb3B0cXdlaHZzYnZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NDcyNjMsImV4cCI6MjA5MTIyMzI2M30.Za9MeR-E_W-x_7_eIGe6ZsQPDvMhBFN1SLlEcHRQPz4';
+
 // ── DATA ── loaded from Supabase ──────────────────────────
 const DEFAULT_FAQS = [
   {id:1,topic:"leads",role:"both",q:"How do I add a new lead in Zoho CRM?",a:`<p>Go to <code>Leads</code> in the top navigation bar, then click <strong>+ New Lead</strong>. Fill in required fields (marked with *) and click <strong>Save</strong>.</p><ul><li>Required fields: Last Name, Company, Lead Source</li><li>Import in bulk via <code>Leads → Import</code></li></ul><div class="tip">Always check for duplicates before creating a new lead using <em>Find & Merge Duplicates</em>.</div>`,photo:""},
@@ -727,7 +728,7 @@ window.addEventListener('storage', e => {
 // ── GET TOKEN FROM SUPABASE ONLY ─────────────────
 async function getActiveToken() {
   try {
-    const res = await fetch(`${SB_URL}/rest/v1/zoho_tokens?id=eq.1&select=access_token`, {
+    const res = await fetch(`${SB_URL}/rest/v1/zoho_tokens?id=eq.1&select=access_token,expires_at`, {
       headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
     });
     const rows = await res.json();
@@ -771,49 +772,39 @@ function formatDate(dateStr) {
 }
 
 function renderLeadCard(lead) {
-  const name = [lead.First_Name, lead.Last_Name].filter(Boolean).join(' ') || 'Unknown';
-  const company = lead.Company || '—';
-  const status = lead.Lead_Status || lead.Status || 'Unknown';
-  const email = lead.Email || '—';
-  const phone = lead.Phone || lead.Mobile || '—';
+  const name = lead.Last_Name || 'Unknown';
+  const phone = lead.Phone || '—';
+  const status = lead.Lead_Status || '—';
+  const subStatus = lead.Sub_Lead_Status || '—';
+  const queueStatus = lead.Lead_Queue_Status || '—';
   const owner = lead.Owner ? (lead.Owner.name || lead.Owner) : '—';
-  const created = formatDate(lead.Created_Time);
+  const ownerEmail = lead.Owner ? (lead.Owner.email || '—') : '—';
+  const workingAgent = lead.Working_Agent || '—';
+  const ucid = lead.UCID_Number || '—';
   const source = lead.Lead_Source || '—';
+  const callId = lead.Call_ID || '—';
+  const inbound = lead.Inbound_Call_Count || 0;
   const statusClass = getStatusClass(status);
 
   return `<div class="lead-card">
     <div class="lead-card-top">
       <div>
         <div class="lead-name">${name}</div>
-        <div class="lead-company">${company}</div>
+        <div class="lead-company">${phone}</div>
       </div>
       <span class="lead-status-pill ${statusClass}">${status}</span>
     </div>
     <div class="lead-meta">
-      <div class="lead-meta-item">
-        <span class="meta-label">Email</span>
-        <span class="meta-value">${email}</span>
-      </div>
-      <div class="lead-meta-item">
-        <span class="meta-label">Phone</span>
-        <span class="meta-value">${phone}</span>
-      </div>
-      <div class="lead-meta-item">
-        <span class="meta-label">Source</span>
-        <span class="meta-value">${source}</span>
-      </div>
-      <div class="lead-meta-item">
-        <span class="meta-label">Owner</span>
-        <span class="meta-value highlight">${owner}</span>
-      </div>
-      <div class="lead-meta-item">
-        <span class="meta-label">Created</span>
-        <span class="meta-value">${created}</span>
-      </div>
-      <div class="lead-meta-item">
-        <span class="meta-label">Lead ID</span>
-        <span class="meta-value" style="font-size:11px">${lead.id || '—'}</span>
-      </div>
+      <div class="lead-meta-item"><span class="meta-label">Sub Status</span><span class="meta-value">${subStatus}</span></div>
+      <div class="lead-meta-item"><span class="meta-label">Queue Status</span><span class="meta-value">${queueStatus}</span></div>
+      <div class="lead-meta-item"><span class="meta-label">Owner</span><span class="meta-value highlight">${owner}</span></div>
+      <div class="lead-meta-item"><span class="meta-label">Owner Email</span><span class="meta-value">${ownerEmail}</span></div>
+      <div class="lead-meta-item"><span class="meta-label">Working Agent</span><span class="meta-value">${workingAgent}</span></div>
+      <div class="lead-meta-item"><span class="meta-label">UCID</span><span class="meta-value">${ucid}</span></div>
+      <div class="lead-meta-item"><span class="meta-label">Lead Source</span><span class="meta-value">${source}</span></div>
+      <div class="lead-meta-item"><span class="meta-label">Inbound Calls</span><span class="meta-value">${inbound}</span></div>
+      <div class="lead-meta-item"><span class="meta-label">Call ID</span><span class="meta-value" style="font-size:11px">${callId}</span></div>
+      <div class="lead-meta-item"><span class="meta-label">Lead ID</span><span class="meta-value" style="font-size:11px">${lead.id || '—'}</span></div>
     </div>
   </div>`;
 }
@@ -821,7 +812,7 @@ function renderLeadCard(lead) {
 async function getActiveToken() {
   // Always fetch latest token from Supabase — admin panel keeps it fresh every 29 min
   try {
-    const res = await fetch(`${SB_URL}/rest/v1/zoho_tokens?id=eq.1&select=access_token`, {
+    const res = await fetch(`${SB_URL}/rest/v1/zoho_tokens?id=eq.1&select=access_token,expires_at`, {
       headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
     });
     const rows = await res.json();
@@ -833,75 +824,127 @@ async function getActiveToken() {
   return localStorage.getItem('zoho_access_token') || '';
 }
 
+// ── ERROR POPUP ───────────────────────────────────────────────
+function showErrorPopup(title, detail) {
+  const existing = document.getElementById('error-popup-overlay');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'error-popup-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:1rem';
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:14px;padding:1.5rem;max-width:480px;width:100%;border:1px solid #E8E4DC;font-family:DM Sans,sans-serif">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+        <div style="width:36px;height:36px;border-radius:50%;background:#FBEAEA;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A32020" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <div style="font-size:15px;font-weight:500;color:#1A1814">${title}</div>
+      </div>
+      <pre style="background:#F7F5F0;border-radius:8px;padding:12px;font-size:12px;color:#5C5850;overflow:auto;white-space:pre-wrap;max-height:200px;border:1px solid #E8E4DC">${detail}</pre>
+      <button onclick="document.getElementById('error-popup-overlay').remove()" style="margin-top:1rem;width:100%;padding:10px;background:#1D5C8A;color:white;border:none;border-radius:8px;font-size:14px;cursor:pointer;font-family:DM Sans,sans-serif">Close</button>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+}
+
+// ── LEAD LOOKUP ───────────────────────────────────────────────
+async function searchLead(inputValue, accessToken) {
+  inputValue = inputValue.trim();
+  let searchField = '';
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^[0-9]{10,15}$/;
+  if (emailRegex.test(inputValue))      searchField = 'Email';
+  else if (phoneRegex.test(inputValue)) searchField = 'Phone';
+  else                                   searchField = 'Customer_ID';
+
+  const fromDate = '2026-10-15T00:00:00+05:30';
+  const toDate   = new Date().toISOString();
+
+  const query = `
+    select id, Last_Name, Phone, Owner, Agent_Assigned_Time, Call_connected_with,
+    Owner.email, First_Activity_Done_by, Working_Agent, Lead_Status, UCID_Number,
+    Sub_Lead_Status, Lead_Queue_Status, Inbound_Call_Count, East_Coast_Route,
+    Lead_Source, Expired, Inbound_Call_Count1, L1_Auto_OB_Call_Count,
+    L1_Manual_Call_Count, L1_Rechurn_Call_Count, L2_Auto_OB_Call_Count,
+    L2_Manual_Call_Count, L2_Rechurn_Call_Count, L2_Inbond_Call_Count,
+    L1_Inbond_Call_Count, Manual_Call_Count, Auto_OB_Call_Count, Call_ID
+    from Leads
+    where (
+      (${searchField} = '${inputValue}' AND Lead_Status != 'Contacted')
+      AND (Lead_Queue_Status != 'Disqualified' AND Lead_Queue_Status != 'DISQUALIFIED LEADS')
+      AND (Created_Time between '${fromDate}' and '${toDate}' AND Expired = false)
+    )
+    ORDER BY Created_Time DESC
+    limit 1
+  `;
+
+  const res = await fetch('https://www.zohoapis.in/crm/v7/coql', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Zoho-oauthtoken ${accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ select_query: query })
+  });
+
+  const data = await res.json();
+  return { data, status: res.status };
+}
+
 async function lookupLeads() {
-  const customerId = document.getElementById('customer-id-input').value.trim();
-  if (!customerId) {
+  const inputValue = document.getElementById('customer-id-input').value.trim();
+  if (!inputValue) {
     document.getElementById('lead-results-wrap').innerHTML =
-      `<div class="lookup-error"><span>⚠</span> Please enter a Customer ID to search.</div>`;
+      `<div class="lookup-error"><span>⚠</span> Please enter a Customer ID, phone number, or email.</div>`;
     return;
   }
 
   const token = await getActiveToken();
   if (!token) {
     document.getElementById('lead-results-wrap').innerHTML =
-      `<div class="lookup-error"><span>⚠</span> Access token not available. Please contact your admin to update the Zoho token.</div>`;
+      `<div class="lookup-error"><span>⚠</span> Access token not available. Please ask your admin to update the Zoho token in Supabase.</div>`;
     return;
   }
 
   const btn = document.getElementById('lookup-btn');
   btn.disabled = true;
   btn.innerHTML = `<div class="spinner" style="width:14px;height:14px;margin:0;border-width:2px"></div> Searching…`;
-
   document.getElementById('lead-results-wrap').innerHTML =
-    `<div class="lookup-loading"><div class="spinner"></div>Fetching active leads for Customer ID <strong>${customerId}</strong>…</div>`;
-
-  // Date filter: 15 Oct 2025 → today
-  const fromDate = '2025-10-15T00:00:00+05:30';
-  const toDate   = new Date().toISOString();
-
-  // Zoho CRM COQL query with filters
-  // Expired checkbox false, Created_Time in range, Customer_ID matches
-  const coql = `SELECT id, First_Name, Last_Name, Company, Email, Phone, Mobile, Lead_Status, Lead_Source, Owner, Created_Time FROM Leads WHERE (Expired = false AND Created_Time >= '${fromDate}' AND Created_Time <= '${toDate}' AND Customer_ID = '${customerId}') LIMIT 50`;
-
-  const BASE = 'https://www.zohoapis.in/crm/v6';
+    `<div class="lookup-loading"><div class="spinner"></div>Searching for <strong>${inputValue}</strong>…</div>`;
 
   try {
-    const res = await fetch(`${BASE}/coql`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Zoho-oauthtoken ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ select_query: coql })
-    });
+    const { data, status } = await searchLead(inputValue, token);
 
     btn.disabled = false;
     btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Leads`;
 
-    if (res.status === 401) {
-      document.getElementById('lead-results-wrap').innerHTML =
-        `<div class="lookup-error">⚠ Access token expired or invalid. Please update your token above.</div>`;
-      document.getElementById('token-setup-wrap').style.display = 'block';
+    // ── Handle Zoho errors ──
+    if (status === 401) {
+      showErrorPopup('Token Expired', 'Your Zoho access token is expired or invalid.\n\nError: 401 Unauthorized\n\nAsk your admin to update the token in Supabase.');
+      document.getElementById('lead-results-wrap').innerHTML = `<div class="lookup-error">⚠ Token expired — see error popup.</div>`;
       return;
     }
 
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      const msg = errData?.message || `HTTP ${res.status}`;
-      document.getElementById('lead-results-wrap').innerHTML =
-        `<div class="lookup-error">⚠ Zoho API error: ${msg}</div>`;
+    if (data.status === 'error' || data.code || (data.errors && data.errors.length)) {
+      const errDetail = JSON.stringify(data, null, 2);
+      showErrorPopup('Zoho API Error', errDetail);
+      document.getElementById('lead-results-wrap').innerHTML = `<div class="lookup-error">⚠ Zoho returned an error — see popup for details.</div>`;
       return;
     }
 
-    const data = await res.json();
+    if (!status.toString().startsWith('2')) {
+      showErrorPopup(`HTTP ${status} Error`, JSON.stringify(data, null, 2));
+      document.getElementById('lead-results-wrap').innerHTML = `<div class="lookup-error">⚠ API error ${status} — see popup for details.</div>`;
+      return;
+    }
+
     const leads = data.data || [];
 
     if (!leads.length) {
       document.getElementById('lead-results-wrap').innerHTML = `
         <div class="lookup-empty">
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <p>No active leads found for Customer ID <strong>${customerId}</strong></p>
-          <p style="font-size:12px;margin-top:6px">Filters: Expired = false · Created 15 Oct 2025 → today</p>
+          <p>No active leads found for <strong>${inputValue}</strong></p>
+          <p style="font-size:12px;margin-top:6px">Filters: Expired = false · Lead_Status ≠ Contacted · Not Disqualified</p>
         </div>`;
       return;
     }
@@ -909,7 +952,7 @@ async function lookupLeads() {
     document.getElementById('lead-results-wrap').innerHTML = `
       <div class="lead-results">
         <div class="lead-results-header">
-          <span class="results-title">Active leads for Customer ID: <strong>${customerId}</strong></span>
+          <span class="results-title">Results for: <strong>${inputValue}</strong></span>
           <span class="results-count">${leads.length} lead${leads.length!==1?'s':''}</span>
         </div>
         <div class="lead-grid">${leads.map(renderLeadCard).join('')}</div>
@@ -918,24 +961,8 @@ async function lookupLeads() {
   } catch(err) {
     btn.disabled = false;
     btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg> Search Leads`;
-
-    const isLocal = window.location.protocol === 'file:';
-    if (isLocal) {
-      document.getElementById('lead-results-wrap').innerHTML = `
-        <div class="lookup-error" style="flex-direction:column;gap:8px">
-          <div>⚠ <strong>CORS restriction:</strong> Open this page from your Vercel URL, not a local file.</div>
-          <div style="font-size:12px">Go to <strong>https://admin-liart-six-50.vercel.app/</strong></div>
-        </div>`;
-    } else {
-      document.getElementById('lead-results-wrap').innerHTML = `
-        <div class="lookup-error" style="flex-direction:column;gap:8px">
-          <div>⚠ <strong>Error:</strong> ${err.message}</div>
-          <div style="font-size:12px;margin-top:4px">
-            Make sure your Zoho access token is active in the admin panel.<br>
-            Go to <a href="/admin.html" style="color:var(--accent)">admin panel → API & Database → Refresh Token ↗</a>
-          </div>
-        </div>`;
-    }
+    showErrorPopup('Network Error', `${err.message}\n\nThis usually means:\n• CORS is blocking the request (open from Vercel, not local file)\n• No internet connection\n• Zoho API is unreachable`);
+    document.getElementById('lead-results-wrap').innerHTML = `<div class="lookup-error">⚠ Network error — see popup for details.</div>`;
   }
 }
 
