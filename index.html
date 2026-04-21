@@ -856,7 +856,7 @@ async function searchLead(inputValue, accessToken) {
   else if (phoneRegex.test(inputValue)) searchField = 'Phone';
   else                                   searchField = 'Customer_ID';
 
-  const fromDate = '2026-10-15T00:00:00+05:30';
+  const fromDate = '2025-10-15T00:00:00+05:30';
   const toDate   = new Date().toISOString();
 
   const query = `
