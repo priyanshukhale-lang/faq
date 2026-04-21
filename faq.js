@@ -303,7 +303,7 @@ function formatZohoDate(date) {
 async function searchLead(inputValue, accessToken) {
   inputValue = inputValue.trim();
 const fromDate = "2025-10-15T00:00:01+05:30";
-
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$
 // same as formatted_time
 const toDate = formatZohoDate(new Date());
   if (emailRegex.test(inputValue)) searchField = 'Email';
