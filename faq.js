@@ -308,12 +308,9 @@ L1_Manual_Call_Count, L1_Rechurn_Call_Count, L2_Auto_OB_Call_Count,
 L2_Manual_Call_Count, L2_Rechurn_Call_Count, L2_Inbond_Call_Count,
 L1_Inbond_Call_Count, Manual_Call_Count, Auto_OB_Call_Count, Call_ID
 from Leads
-where (
-  (${searchField} = '${inputValue}' AND Lead_Status != 'Contacted')
-  AND (Lead_Queue_Status  != 'Disqualified' AND Lead_Queue_Status  != 'DISQUALIFIED LEADS')
-  AND (Created_Time between '${fromDate}' and '${toDate}' AND Expired = false)
-)
-ORDER BY Created_Time DESC
+where 
+ (((${searchField} = '${inputValue}'  and Lead_Status != 'Contacted') and (Lead_Queue_Status != 'Disqualified' and Lead_Queue_Status != 'DISQUALIFIED LEADS'))
+ and (Created_Time between  '${fromDate}' and '${toDate}' and Expired = false)) ORDER BY Created_Time DESC limit 1" ORDER BY Created_Time DESC
 limit 1
 `;
   // 🔥 CALL YOUR BACKEND INSTEAD OF ZOHO
