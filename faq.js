@@ -289,7 +289,8 @@ function showErrorPopup(title, detail) {
 // ── LEAD LOOKUP ───────────────────────────────────────────────
 async function searchLead(inputValue, accessToken) {
   inputValue = inputValue.trim();
-
+const fromDate = '2026-10-15T00:00:00+05:30';
+const toDate = new Date().toISOString();
   let searchField = '';
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const phoneRegex = /^[0-9]{10,15}$/;
