@@ -286,15 +286,26 @@ function showErrorPopup(title, detail) {
   overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
 }
 
+function formatZohoDate(date) {
+  const pad = (n) => n.toString().padStart(2, '0');
+
+  return date.getFullYear() + '-' +
+    pad(date.getMonth() + 1) + '-' +
+    pad(date.getDate()) + 'T' +
+    pad(date.getHours()) + ':' +
+    pad(date.getMinutes()) + ':' +
+    pad(date.getSeconds()) + '+05:30';
+}
+
+// same as creation_block
+
 // ── LEAD LOOKUP ───────────────────────────────────────────────
 async function searchLead(inputValue, accessToken) {
   inputValue = inputValue.trim();
-const fromDate = '2026-10-15T00:00:00+05:30';
-const toDate = new Date().toISOString();
-  let searchField = '';
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^[0-9]{10,15}$/;
+const fromDate = "2025-10-15T00:00:01+05:30";
 
+// same as formatted_time
+const toDate = formatZohoDate(new Date());
   if (emailRegex.test(inputValue)) searchField = 'Email';
   else if (phoneRegex.test(inputValue)) searchField = 'Phone';
   else searchField = 'Customer_ID';
